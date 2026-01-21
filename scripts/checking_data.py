@@ -38,7 +38,7 @@ genre_counts = Counter(genres)
 genre_df = pd.DataFrame(genre_counts.items(), columns=['genre', 'count'])
 
 #extracting year from title
-movies['year'] = movies['title'].str.extract(r'(\d{4})')
+movies['year'] = movies['title'].str.extract(r'\((\d{4})\)')
 movies['year'] = pd.to_numeric(movies['year'])
 #print(movies[['title', 'year','genres']].head(20))
 
@@ -46,6 +46,6 @@ movies['year'] = pd.to_numeric(movies['year'])
 movies_with_ratings = movies.merge(avg_ratings, on='movieId')
 #print(movies_with_ratings[['year', 'avg_rating']].corr())
 
-#what data looks like now
-print(movies.head())
-print(ratings.head())
+#debugging
+print(tags.info())
+
