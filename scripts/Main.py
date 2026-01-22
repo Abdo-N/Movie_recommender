@@ -4,27 +4,48 @@ import sqlite3 as sq
 conn = sq.connect("D:/Repos/Movie_recommender/Databases/Movies.db")
 cursor = conn.cursor()
 
-user_input = input("What movie have you enjoyed recently: ")
-#statement = pd.read_sql_query(open('D:/Repos/Movie_recommender/SQL/Qeury.SQL').read(), conn)
+user_input = input("What movie did you enjoy recently: ")
+recommendations = "You might also like: "
 
 def find_movie_ID () -> int:
     movie_ID_query = f"SELECT movieId FROM movies WHERE title LIKE '%{user_input}%'"
     movie_ID = pd.read_sql(movie_ID_query, conn) #contains sequels and similar titles
     return movie_ID.loc[0, 'movieId']  # This gets the actual integer value
 
-def find_users ()
-users_query = f"""SELECT movie-recommendations
-                FROM ratings
-                WHERE userId IN (
-                -- subquery: users who liked the input movie
-                SELECT userId 
-                FROM ratings 
-                WHERE movieId = {find_movie_ID} AND rating >= 4) AND rating >= 4"""
-    
+def find_similar_ID () -> str:
+    result = ""
+    movie_ID_query = f"SELECT title FROM movies WHERE movieId IN (SELECT movieId FROM movies WHERE title LIKE '%{user_input}%')"
+    movie_titles = pd.read_sql(movie_ID_query, conn) #contains sequels and similar titles
+    for i in movie_titles.index:
+        result += movie_titles.loc[i, "title"] + "\n"
+    return result
 
 
-print(find_movie_ID())
-print(find_users())
+movie_id = find_movie_ID()  # Call once and store
+
+movies_query = f"""
+SELECT movies.title, movies.movieId, AVG(ratings.rating) as avg_rating, COUNT(*) as num_ratings 
+FROM ratings 
+JOIN movies ON ratings.movieId = movies.movieId
+WHERE ratings.userId IN (
+    SELECT userId FROM ratings 
+    WHERE movieId = {movie_id} AND rating >= 4) 
+AND ratings.rating >= 4 
+AND ratings.movieId != {movie_id}
+GROUP BY ratings.movieId
+ORDER BY avg_rating DESC 
+LIMIT 10
+"""
+
+recommendations = "Movies matching your search:\n"
+recommendations += find_similar_ID()
+recommendations += "\nBecause you enjoyed these, you might also like:\n"
+recommendations_df = pd.read_sql(movies_query, conn)
+
+for i in recommendations_df.index:
+    recommendations += recommendations_df.loc[i, "title"] + "\n"
+
+print(recommendations)
 
 """1. User inputs movie name
 2. algorithm finds users that have rated the movie highly (4+ stars)
