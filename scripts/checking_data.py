@@ -1,8 +1,9 @@
 import pandas as pd
+from config import MOVIES_CSV, RATINGS_CSV, TAGS_CSV
 
-movies = pd.read_csv('D:/Repos/Movie_recommender/Data_sets/movies.csv') #moveID, title, genres
-ratings = pd.read_csv('D:/Repos/Movie_recommender/Data_sets/ratings.csv') #userID, movieID, rating, timestamp
-tags = pd.read_csv('D:/Repos/Movie_recommender/Data_sets/tags.csv') #userID, moveID, tag, timestamp
+movies = pd.read_csv(MOVIES_CSV) #moveID, title, genres
+ratings = pd.read_csv(RATINGS_CSV) #userID, movieID, rating, timestamp
+tags = pd.read_csv(TAGS_CSV) #userID, moveID, tag, timestamp
 
 #print(movies.head())
 #print(tags.info())

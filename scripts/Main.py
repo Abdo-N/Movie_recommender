@@ -1,7 +1,8 @@
 import pandas as pd
 import sqlite3 as sq
+from config import DB_PATH
 
-conn = sq.connect("D:/Repos/Movie_recommender/Databases/Movies.db")
+conn = sq.connect(DB_PATH)
 cursor = conn.cursor()
 
 user_input = input("What movie did you enjoy recently: ")

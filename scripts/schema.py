@@ -1,11 +1,12 @@
 import sqlite3 as sq
+from config import DB_PATH, MOVIES_CSV, RATINGS_CSV, TAGS_CSV
 
 #Movies table: movieId, title, year, genres
 #Ratings table: userId, movieId, rating
 #Users table: userId, avg_rating, num_ratings
 
 # One connection for all tables
-conn = sq.connect("D:/Repos/Movie_recommender/Databases/Movies.db")
+conn = sq.connect(DB_PATH)
 cursor = conn.cursor()
 
 # Create movies table with data types and primary key
@@ -40,24 +41,24 @@ conn.commit()  # Save the changes
 
 import pandas as pd
 # Load data from CSVs
-movies = pd.read_csv('D:/Repos/Movie_recommender/Data_sets/movies.csv')
-ratings = pd.read_csv('D:/Repos/Movie_recommender/Data_sets/ratings.csv')
-tags = pd.read_csv('D:/Repos/Movie_recommender/Data_sets/tags.csv')
+movies = pd.read_csv(MOVIES_CSV)
+ratings = pd.read_csv(RATINGS_CSV)
+tags = pd.read_csv(TAGS_CSV)
 
 # Extract year if you haven't already
 movies['year'] = movies['title'].str.extract(r'\((\d{4})\)')
 movies['year'] = pd.to_numeric(movies['year'])
 
 # Now insert into database
-conn = sq.connect("D:/Repos/Movie_recommender/Databases/Movies.db")
+conn = sq.connect(DB_PATH)
 movies.to_sql('movies', conn, if_exists='replace', index=False)
 
 ratings = ratings.drop('timestamp', axis = 1)
-conn = sq.connect("D:/Repos/Movie_recommender/Databases/Movies.db")
+conn = sq.connect(DB_PATH)
 ratings.to_sql('ratings', conn, if_exists='replace', index=False)
 
 tags = tags.drop('timestamp', axis = 1)
-conn = sq.connect("D:/Repos/Movie_recommender/Databases/Movies.db")
+conn = sq.connect(DB_PATH)
 tags.to_sql('tags', conn, if_exists='replace', index=False)
 
 users = ratings.groupby('userId')['rating'].agg(['count','mean'])
